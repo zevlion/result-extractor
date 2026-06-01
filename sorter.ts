@@ -293,7 +293,7 @@ export function guessDepartment(
     departments: Department[]
 ): Department[] {
     const prefixes = new Set(
-        courseCodes.map((c) => c.replace(/^\./, "").split(" ")[0].trim().toUpperCase())
+        courseCodes.map((c) => c.replace(/^\./, "").split(" ")[0]!.trim().toUpperCase())
     );
 
     return departments

@@ -207,6 +207,7 @@ try {
     }
 
     const { student, semesters } = gradesData;
+    delete (student as any).name;
 
     console.table(student);
 
@@ -220,15 +221,19 @@ try {
     let selectedDepCode = values.dep;
 
     if (!selectedDepCode) {
+        const displayedDeps: typeof departments = [];
+
         if (guessed.length > 0) {
-            guessed.slice(0, 5).forEach((d, i) =>
-                console.log(`  ${i + 1}. [${d.code}] ${d.name}`)
-            );
+            guessed.slice(0, 5).forEach((d) => {
+                displayedDeps.push(d);
+                console.log(`  ${displayedDeps.length}. [${d.code}] ${d.name}`);
+            });
         }
 
-        departments.forEach((d, i) =>
-            console.log(`  ${String(i + 1).padStart(2)}. [${d.code}] ${d.name}`)
-        );
+        departments.forEach((d) => {
+            displayedDeps.push(d);
+            console.log(`  ${String(displayedDeps.length).padStart(2)}. [${d.code}] ${d.name}`);
+        });
 
         const depInput = await promptUser(
             "\nEnter department number or code (e.g. D_SEN), or press Enter to skip: "
@@ -237,11 +242,7 @@ try {
         if (depInput) {
             if (/^\d+$/.test(depInput)) {
                 const idx = Number(depInput) - 1;
-                if (guessed.length > 0 && idx >= 0 && idx < guessed.length) {
-                    selectedDepCode = guessed[idx]?.code ?? "";
-                } else {
-                    selectedDepCode = departments[idx]?.code ?? "";
-                }
+                selectedDepCode = displayedDeps[idx]?.code ?? "";
             } else {
                 selectedDepCode = depInput.trim();
             }
@@ -386,6 +387,9 @@ try {
                 (c?.grade && c.grade !== "IP" && c.grade !== "");
         });
     }
+
+    process.stdout.write("\x1bc");
+    console.table(student);
 
     const packed = semestersToProcess.filter((s) => s.courses.length > 0);
     const sorted = sortGrades(packed, "grade", "desc");
